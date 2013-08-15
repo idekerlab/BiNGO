@@ -10,10 +10,10 @@
 		<osgi.api.version>4.2.0</osgi.api.version>
 	</properties>
 
+	<groupId>bingo</groupId>
 	<artifactId>bingo-impl</artifactId>
 	<packaging>bundle</packaging>
-	<name>${bundle.symbolicName}</name>
-
+	<name>BiNGO</name>
 	<version>3.0.0</version>
 
 	<build>
@@ -127,6 +127,4 @@
 		</dependency>
 		
 	</dependencies>
-
-	<groupId>bingo</groupId>
 </project>
