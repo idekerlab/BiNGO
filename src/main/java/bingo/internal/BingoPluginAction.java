@@ -13,8 +13,8 @@ import bingo.internal.ui.SettingsPanel;
 public class BingoPluginAction extends AbstractCyAction {
 
 	private static final String CURRENT_WORKING_DIRECTORY = "user.dir";
-	private static final String MENU_NAME = "Start BiNGO Plugin";
-	private static final String MENU_CATEGORY = "Tools";
+	private static final String MENU_NAME = "BiNGO";
+	private static final String MENU_CATEGORY = "Apps";
 	private static final String WINDOW_TITLE = "BiNGO Settings";
 	private final CySwingAppAdapter adapter;
 	private final OpenBrowser openBrowserService;
