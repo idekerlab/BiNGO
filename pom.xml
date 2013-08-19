@@ -14,7 +14,7 @@
 	<artifactId>bingo-impl</artifactId>
 	<packaging>bundle</packaging>
 	<name>BiNGO</name>
-	<version>3.0.0</version>
+	<version>3.0.1</version>
 
 	<build>
 		<plugins>
