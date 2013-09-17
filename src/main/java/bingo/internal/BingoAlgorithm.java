@@ -64,7 +64,7 @@ public class BingoAlgorithm {
 		this.params = params;
 	}
 
-	public CalculateTestTask calculate_distribution(TaskMonitor tm) throws InterruptedException {
+	public CalculateTestTask calculate_distribution() {
 		CalculateTestTask test = null;
 		HashMap testMap = null;
 
@@ -74,23 +74,23 @@ public class BingoAlgorithm {
 		} else if (params.getTest().equals(HYPERGEOMETRIC)) {
 			if (params.getOverOrUnder().equals(OVERSTRING)) {
 				test = new HypergeometricTestCalculate(new StandardDistributionCount(params.getAnnotation(),
-						params.getOntology(), params.getSelectedNodes(), params.getAllNodes(), params.getAlias()), tm);
+						params.getOntology(), params.getSelectedNodes(), params.getAllNodes(), params.getAlias()));
 			} else {
 				test = new HypergeometricTestCalculateUnder(new StandardDistributionCountNeg(params.getAnnotation(),
-						params.getOntology(), params.getSelectedNodes(), params.getAllNodes(), params.getAlias()), tm);
+						params.getOntology(), params.getSelectedNodes(), params.getAllNodes(), params.getAlias()));
 			}
 		} else if (params.getTest().equals(BINOMIAL)) {
 			if (params.getOverOrUnder().equals(OVERSTRING)) {
 				test = new BinomialTestCalculate(new StandardDistributionCount(params.getAnnotation(),
-						params.getOntology(), params.getSelectedNodes(), params.getAllNodes(), params.getAlias()), tm);
+						params.getOntology(), params.getSelectedNodes(), params.getAllNodes(), params.getAlias()));
 			} else {
 				test = new BinomialTestCalculateUnder(new StandardDistributionCountNeg(params.getAnnotation(),
-						params.getOntology(), params.getSelectedNodes(), params.getAllNodes(), params.getAlias()), tm);
+						params.getOntology(), params.getSelectedNodes(), params.getAllNodes(), params.getAlias()));
 			}
 		} else if (params.getTest().equals(PARENT_CHILD_INTERSECTION)) {
 			if (params.getOverOrUnder().equals(OVERSTRING)) {
 				test = new HypergeometricTestCalculate(new ParentChildIntersectionCount(params.getAnnotation(),
-						params.getOntology(), params.getSelectedNodes(), params.getAllNodes(), params.getAlias(), tm), tm);
+						params.getOntology(), params.getSelectedNodes(), params.getAllNodes(), params.getAlias()));
 			} else {
 				// to be implemented
 			}

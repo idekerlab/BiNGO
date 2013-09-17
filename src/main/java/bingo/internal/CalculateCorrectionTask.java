@@ -42,16 +42,14 @@ import java.util.Map;
  * <code>javax.swing.ProgressMonitor</code>
  */
 
-public interface CalculateCorrectionTask {
+public abstract class CalculateCorrectionTask extends BingoTask {
 
-	String[] getOrdenedPvalues();
+	abstract String[] getOrdenedPvalues();
 
-	String[] getAdjustedPvalues();
+	abstract String[] getAdjustedPvalues();
 
-	String[] getOrdenedGOLabels();
+	abstract String[] getOrdenedGOLabels();
 
-	Map getCorrectionMap();
+	abstract Map getCorrectionMap();
 	
-	void calculate();
-
 }

@@ -16,39 +16,41 @@ import java.util.Set;
  * 
  * @author stmae
  */
-public interface DistributionCount extends CalculateTestTask {
+public abstract class DistributionCount extends CalculateTestTask {
+	
+	abstract public void calculate();
 
 	/**
 	 * method for compiling GO classifications for given node
 	 */
 
-	Set getNodeClassifications(String node);
+	abstract Set getNodeClassifications(String node);
 
 	/**
 	 * method for making the hashmap for small n.
 	 */
-	void countSmallN();
+	abstract void countSmallN();
 
 	/**
 	 * method for making the hashmap for the small x.
 	 */
-	void countSmallX();
+	abstract void countSmallX();
 
 	/**
 	 * method that counts for small n and small x.
 	 */
-	Map count(Set nodes);
+	abstract Map count(Set nodes);
 
 	/**
 	 * counts big N. unclassified nodes are not counted ; no correction for
 	 * function_unknown nodes (yet)(requires user input)
 	 */
-	void countBigN();
+	abstract void countBigN();
 
 	/**
 	 * counts big X. unclassified nodes are not counted ; no correction for
 	 * function_unknown nodes (yet)(requires user input)
 	 */
-	void countBigX();
+	abstract void countBigX();
 
 }

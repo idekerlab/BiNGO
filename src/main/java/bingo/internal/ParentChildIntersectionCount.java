@@ -55,7 +55,7 @@ import bingo.internal.ontology.Ontology;
  * *************************************************************
  */
 
-public class ParentChildIntersectionCount implements DistributionCount {
+public class ParentChildIntersectionCount extends DistributionCount {
 
 	/**
 	 * the annotation.
@@ -94,14 +94,8 @@ public class ParentChildIntersectionCount implements DistributionCount {
 
 	// Keep track of progress for monitoring:
 	private int maxValue;
-	private TaskMonitor taskMonitor = null;
-	private boolean interrupted = false;
 
-
-	public ParentChildIntersectionCount(Annotation annotation, Ontology ontology, Set selectedNodes, Set refNodes, Map alias, TaskMonitor tm) {
-		this.taskMonitor = tm;
-		tm.setTitle("Counting genes in GO categories...");
-		
+	public ParentChildIntersectionCount(Annotation annotation, Ontology ontology, Set selectedNodes, Set refNodes, Map alias) {		
 		this.annotation = annotation;
 		this.ontology = ontology;
 		this.alias = alias;
@@ -110,10 +104,25 @@ public class ParentChildIntersectionCount implements DistributionCount {
 		this.selectedNodes = selectedNodes;
 		this.refNodes = refNodes;
 	}
-
+	
+	public ParentChildIntersectionCount(Annotation annotation, Ontology ontology, Set selectedNodes, Set refNodes, Map alias, TaskMonitor taskMonitor) {
+		this(annotation, ontology, selectedNodes, refNodes, alias);
+		this.taskMonitor = taskMonitor;
+	}
+	
 	/*--------------------------------------------------------------
 	  METHODS.
 	--------------------------------------------------------------*/
+	
+	public void calculate() {
+		if(taskMonitor != null)
+			taskMonitor.setTitle("Counting genes in GO categories...");
+		
+		countSmallX();
+		countSmallN();
+		countBigX();
+		countBigN();		
+	}
 
 	/**
 	 * method for compiling GO classifications for given node
@@ -269,17 +278,5 @@ public class ParentChildIntersectionCount implements DistributionCount {
 	 */
 	public Map getMapBigX() {
 		return mapBigX;
-	}
-
-	public void calculate() {
-		countSmallX();
-		countSmallN();
-		countBigX();
-		countBigN();
-	}
-
-
-	public void cancel() {
-		this.interrupted = true;
 	}
 }

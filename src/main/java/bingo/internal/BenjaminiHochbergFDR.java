@@ -54,7 +54,7 @@ import org.cytoscape.work.TaskMonitor;
  * ************************************************************************
  */
 
-public class BenjaminiHochbergFDR implements CalculateCorrectionTask {
+public class BenjaminiHochbergFDR extends CalculateCorrectionTask {
 
 	private HashEntry[] hash;
 	/**
@@ -101,8 +101,6 @@ public class BenjaminiHochbergFDR implements CalculateCorrectionTask {
 	// Keep track of progress for monitoring:
 
 	private int maxValue;
-	private TaskMonitor taskMonitor = null;
-	private boolean interrupted = false;
 
 	/*--------------------------------------------------------------
 	CONSTRUCTOR.
@@ -139,6 +137,11 @@ public class BenjaminiHochbergFDR implements CalculateCorrectionTask {
 
 		this.maxValue = pvalues.length;
 	}
+	
+	public BenjaminiHochbergFDR(Map golabelstopvalues, String alpha, TaskMonitor taskMonitor) {
+		this(golabelstopvalues, alpha);
+		this.taskMonitor = taskMonitor;
+	}
 
 	private final class HashEntry {
 		public String key;
@@ -172,7 +175,9 @@ public class BenjaminiHochbergFDR implements CalculateCorrectionTask {
 	 */
 
 	public void calculate() {
-
+		if(taskMonitor != null)
+			taskMonitor.setTitle("Calculating FDR correction");
+		
 		// ordening the pvalues.
 
 		Arrays.sort(hash, new HashComparator());
@@ -245,15 +250,4 @@ public class BenjaminiHochbergFDR implements CalculateCorrectionTask {
 	public String[] getOrdenedGOLabels() {
 		return ordenedGOLabels;
 	}
-
-	public void cancel() {
-		this.interrupted = true;		
-	}
-
-//	public void run(TaskMonitor tm) throws Exception {
-//		this.taskMonitor = tm;
-//		this.taskMonitor.setTitle("Calculating FDR correction");
-//		calculate();
-//	}
-
 }

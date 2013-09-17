@@ -44,14 +44,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+
 import javax.swing.JFrame;
+
+import org.cytoscape.app.swing.CySwingAppAdapter;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNetworkFactory;
 import org.cytoscape.model.CyNode;
-import org.cytoscape.model.CyTable;
 import org.cytoscape.model.CyRow;
-import org.cytoscape.app.swing.CySwingAppAdapter;
+import org.cytoscape.model.CyTable;
 import org.cytoscape.view.layout.CyLayoutAlgorithm;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.CyNetworkViewFactory;
@@ -59,8 +61,8 @@ import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.view.vizmap.VisualStyle;
 import org.cytoscape.work.AbstractTask;
-import org.cytoscape.work.TaskManager;
 import org.cytoscape.work.TaskMonitor;
+import org.cytoscape.work.swing.DialogTaskManager;
 
 import bingo.internal.ontology.Ontology;
 import bingo.internal.ui.ColorPanel;
@@ -216,8 +218,9 @@ public class DisplayBiNGOWindow {
 		buildEdgeAttributes(network);
 
 		// Create View
-		final TaskManager tm = adapter.getTaskManager();
-		tm.execute(new GenericTaskFactory(new CreateViewTask(network)).createTaskIterator());
+		final CreateViewTask task = new CreateViewTask(network);
+		DialogTaskManager taskManager = adapter.getDialogTaskManager();
+		taskManager.execute(new GenericTaskFactory(task).createTaskIterator());
 
 		// add color scale panel
 		JFrame window = new JFrame(clusterName + " Color Scale");
@@ -259,17 +262,17 @@ public class DisplayBiNGOWindow {
 			// Apply layout only when it is necessary.
 			final CyLayoutAlgorithm layout = adapter.getCyLayoutAlgorithmManager().getLayout("force-directed");
 			//layout.setNetworkView(view);
-			
-			final Object context = layout.getDefaultLayoutContext();
-			adapter.getTaskManager().execute(layout.createTaskIterator(view, context, CyLayoutAlgorithm.ALL_NODE_VIEWS,""));
-			
+
 			TheVisualStyle vs = new TheVisualStyle(adapter, clusterName, Double.parseDouble(alpha));
 			final VisualMappingManager vmm = adapter.getVisualMappingManager();
 			final VisualStyle newStyle = vs.createVisualStyle(view.getModel());
 			vmm.addVisualStyle(newStyle);
 			vmm.setVisualStyle(vs.createVisualStyle(view.getModel()), view);
 			newStyle.apply(view);
-			
+
+			final Object context = layout.getDefaultLayoutContext();
+			insertTasksAfterCurrentTask(layout.createTaskIterator(view, context, CyLayoutAlgorithm.ALL_NODE_VIEWS,""));
+
 			taskMonitor.setProgress(1.0);
 			taskMonitor.setStatusMessage("Network view successfully create for:  "
 					+ network.getDefaultNetworkTable().getRow(network.getSUID()));

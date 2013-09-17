@@ -50,7 +50,7 @@ import org.cytoscape.work.TaskMonitor;
  * *************************************************************
  */
 
-public class HypergeometricTestCalculateUnder implements CalculateTestTask {
+public class HypergeometricTestCalculateUnder extends CalculateTestTask {
 
 	/*--------------------------------------------------------------
 	FIELDS.
@@ -84,17 +84,13 @@ public class HypergeometricTestCalculateUnder implements CalculateTestTask {
 
 	// Keep track of progress for monitoring:
 	private int maxValue;
-	private TaskMonitor taskMonitor = null;
-	private boolean interrupted = false;
 
 	/**
 	 * constructor with as argument the selected cluster and the annotation,
 	 * ontology and alpha.
 	 * @throws InterruptedException 
 	 */
-	public HypergeometricTestCalculateUnder(DistributionCount dc, TaskMonitor tm) throws InterruptedException {
-		this.taskMonitor = tm;
-		this.taskMonitor.setTitle("Calculating Hypergeometric Distribution");
+	public HypergeometricTestCalculateUnder(DistributionCount dc) {
 		dc.calculate();
 		this.mapSmallN = dc.getMapSmallN();
 		this.mapSmallX = dc.getMapSmallX();
@@ -103,6 +99,11 @@ public class HypergeometricTestCalculateUnder implements CalculateTestTask {
 		this.maxValue = mapSmallX.size();
 
 	}
+	
+	public HypergeometricTestCalculateUnder(DistributionCount dc, TaskMonitor taskMonitor) {
+		this(dc);
+		this.taskMonitor = taskMonitor;
+	}
 
 	/**
 	 * method that redirects the calculation of hypergeometric distribution.
@@ -110,6 +111,8 @@ public class HypergeometricTestCalculateUnder implements CalculateTestTask {
 	 * @throws InterruptedException
 	 */
 	public void calculate() throws InterruptedException {
+		if(taskMonitor != null)
+			taskMonitor.setTitle("Calculating Hypergeometric Distribution");
 		
 		HypergeometricDistributionUnder hd;
 		hypergeometricTestMap = new HashMap();
@@ -148,12 +151,10 @@ public class HypergeometricTestCalculateUnder implements CalculateTestTask {
 
 			currentProgress++;
 
-			if (interrupted) {
-				throw new InterruptedException();
+			if (cancelled) {
+				throw new InterruptedException("Hypergeometric P-value calculation cancelled");
 			}
-
 		}
-
 	}
 
 	/*--------------------------------------------------------------
@@ -203,9 +204,5 @@ public class HypergeometricTestCalculateUnder implements CalculateTestTask {
 	 */
 	public Map getMapBigN() {
 		return mapBigN;
-	}
-
-	public void cancel() {
-		this.interrupted = true;
 	}
 }

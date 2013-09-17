@@ -54,7 +54,7 @@ import bingo.internal.ontology.Ontology;
  * *************************************************************
  */
 
-public class StandardDistributionCountNeg implements DistributionCount {
+public class StandardDistributionCountNeg extends DistributionCount {
 
 	/**
 	 * the annotation.
@@ -89,8 +89,6 @@ public class StandardDistributionCountNeg implements DistributionCount {
 
 	// Keep track of progress for monitoring:
 	private int maxValue;
-	private TaskMonitor taskMonitor = null;
-	private boolean interrupted = false;
 
 	public StandardDistributionCountNeg(Annotation annotation, Ontology ontology, Set selectedNodes, Set refNodes,
 			Map<String, Set<String>> alias) {
@@ -99,6 +97,22 @@ public class StandardDistributionCountNeg implements DistributionCount {
 		annotation.setOntology(ontology);
 		this.selectedNodes = selectedNodes;
 		this.refNodes = refNodes;
+	}
+	
+	public StandardDistributionCountNeg(Annotation annotation, Ontology ontology, Set selectedNodes, Set refNodes,
+			Map<String, Set<String>> alias, TaskMonitor taskMonitor) {
+		this(annotation, ontology, selectedNodes, refNodes, alias);
+		this.taskMonitor = taskMonitor;
+	}
+	
+	public void calculate() {
+		if(taskMonitor != null)
+			taskMonitor.setTitle("Counting genes in GO categories...");
+		
+		countSmallX();
+		countSmallN();
+		countBigX();
+		countBigN();
 	}
 
 	/**
@@ -283,20 +297,4 @@ public class StandardDistributionCountNeg implements DistributionCount {
 	public Map getMapBigX() {
 		return mapBigX;
 	}
-
-	public void calculate() {
-		countSmallX();
-		countSmallN();
-		countBigX();
-		countBigN();
-	}
-
-	public void cancel() {
-		this.interrupted = true;
-	}
-
-//	public void run(TaskMonitor tm) throws Exception {
-//		this.taskMonitor = tm;
-//		this.taskMonitor.setTitle("Counting genes in GO categories...");
-//	}
 }

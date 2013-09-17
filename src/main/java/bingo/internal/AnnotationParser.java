@@ -40,7 +40,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.cytoscape.work.Task;
 import org.cytoscape.work.TaskMonitor;
 
 import bingo.internal.ontology.Annotation;
@@ -58,7 +57,7 @@ import bingo.internal.ontology.OntologyTerm;
  * *************************************************************
  */
 
-public class AnnotationParser  {
+public class AnnotationParser extends BingoTask {
 
 	/**
 	 * constant string for the loadcorrect of the filechooser.
@@ -105,8 +104,6 @@ public class AnnotationParser  {
 
 	// Keep track of progress for monitoring:
 	private int maxValue;
-	private TaskMonitor taskMonitor = null;
-	private boolean interrupted = false;
 
 	private Set parentsSet;
 
@@ -122,6 +119,11 @@ public class AnnotationParser  {
 
 		this.maxValue = -1;
 	}
+	
+	public AnnotationParser(BingoParameters params, HashSet<String> genes, TaskMonitor taskMonitor) {
+		this(params, genes);
+		this.taskMonitor = taskMonitor;
+	}
 
 	private String openResourceFile(String name) {
 		return getClass().getResource("/data/" + name).toString();
@@ -134,6 +136,8 @@ public class AnnotationParser  {
 	 * @throws InterruptedException
 	 */
 	public void calculate() throws IOException, InterruptedException {
+		if(taskMonitor != null)
+			taskMonitor.setTitle("Parsing Annotation");
 
 		if (!params.isOntology_default()) {
 			// always perform full remap for .obo files, allows definition of
@@ -254,7 +258,7 @@ public class AnnotationParser  {
 					}
 				}
 			}
-		}
+		} 
 	}
 
 	/**
@@ -555,7 +559,7 @@ public class AnnotationParser  {
 					}
 				}
 			}
-			if (interrupted) {
+			if (cancelled) {
 				status = false;
 				throw new InterruptedException();
 			}
@@ -619,7 +623,7 @@ public class AnnotationParser  {
 					}
 				}
 			}
-			if (interrupted) {
+			if (cancelled) {
 				status = false;
 				throw new InterruptedException();
 			}
@@ -702,9 +706,5 @@ public class AnnotationParser  {
 	 */
 	public boolean getStatus() {
 		return status;
-	}
-
-	public void cancel() {
-		this.interrupted = true;
 	}
 }

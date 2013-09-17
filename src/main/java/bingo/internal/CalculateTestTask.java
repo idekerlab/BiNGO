@@ -35,8 +35,6 @@ package bingo.internal;
 
 import java.util.Map;
 
-import org.cytoscape.work.TaskMonitor;
-
 /**
  * Classes that perform statistical tests can implement this interface so that
  * they can be monitored by a GUI like a
@@ -44,19 +42,17 @@ import org.cytoscape.work.TaskMonitor;
  * <code>javax.swing.ProgressMonitor</code>
  */
 
-public interface CalculateTestTask {
+public abstract class CalculateTestTask extends BingoTask {
 
 	// implement for statistical tests
-	Map<Integer, String> getTestMap();
+	abstract Map<Integer, String> getTestMap();
 
-	Map getMapSmallX();
+	abstract Map getMapSmallX();
 
-	Map getMapSmallN();
+	abstract Map getMapSmallN();
 
-	Map getMapBigX();
+	abstract Map getMapBigX();
 
-	Map getMapBigN();
+	abstract Map getMapBigN();
 	
-	void calculate() throws InterruptedException;
-
 }

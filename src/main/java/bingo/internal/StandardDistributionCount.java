@@ -54,7 +54,7 @@ import bingo.internal.ontology.Ontology;
  * *************************************************************
  */
 
-public class StandardDistributionCount implements DistributionCount {
+public class StandardDistributionCount extends DistributionCount {
 
 	/**
 	 * the annotation.
@@ -87,10 +87,6 @@ public class StandardDistributionCount implements DistributionCount {
 	 */
 	private Map mapBigX;
 
-	// Keep track of progress for monitoring:
-	private TaskMonitor taskMonitor = null;
-	private boolean interrupted = false;
-
 	public StandardDistributionCount(Annotation annotation, Ontology ontology, Set selectedNodes, Set refNodes,
 			Map alias) {
 		this.annotation = annotation;
@@ -99,6 +95,22 @@ public class StandardDistributionCount implements DistributionCount {
 
 		this.selectedNodes = selectedNodes;
 		this.refNodes = refNodes;
+	}
+	
+	public StandardDistributionCount(Annotation annotation, Ontology ontology, Set selectedNodes, Set refNodes,
+			Map alias, TaskMonitor taskMonitor) {
+		this(annotation, ontology, selectedNodes, refNodes, alias);
+		this.taskMonitor = taskMonitor;
+	}
+	
+	public void calculate() {
+		if(taskMonitor != null) 
+			taskMonitor.setTitle("Counting genes in GO categories...");
+		
+		countSmallX();
+		countSmallN();
+		countBigX();
+		countBigN();
 	}
 
 	/**
@@ -237,22 +249,4 @@ public class StandardDistributionCount implements DistributionCount {
 	public Map getMapBigX() {
 		return mapBigX;
 	}
-
-	public void calculate() {
-		countSmallX();
-		countSmallN();
-		countBigX();
-		countBigN();
-	}
-
-	public void cancel() {
-		this.interrupted = true;
-	}
-
-//	public void run(TaskMonitor tm) throws Exception {
-//		this.taskMonitor = tm;
-//		this.taskMonitor.setTitle("Counting genes in GO categories...");
-//		calculate();
-//
-//	}
 }

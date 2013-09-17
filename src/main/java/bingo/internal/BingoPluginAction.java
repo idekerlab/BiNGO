@@ -2,10 +2,13 @@ package bingo.internal;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+
 import javax.swing.JFrame;
+
 import org.cytoscape.app.swing.CySwingAppAdapter;
 import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.util.swing.OpenBrowser;
+import org.cytoscape.work.SynchronousTaskManager;
 
 import bingo.internal.ui.SettingsPanel;
 

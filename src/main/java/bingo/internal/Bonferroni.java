@@ -48,7 +48,7 @@ import org.cytoscape.work.TaskMonitor;
  * *****************************************************************
  */
 
-public class Bonferroni implements CalculateCorrectionTask {
+public class Bonferroni extends CalculateCorrectionTask {
 
 	/*--------------------------------------------------------------
 	FIELDS.
@@ -98,8 +98,6 @@ public class Bonferroni implements CalculateCorrectionTask {
 	// Keep track of progress for monitoring:
 
 	private int maxValue;
-	private TaskMonitor taskMonitor = null;
-	private boolean interrupted = false;
 
 	/*--------------------------------------------------------------
 	CONSTRUCTOR.
@@ -174,6 +172,8 @@ public class Bonferroni implements CalculateCorrectionTask {
 	 * i=1...i* adjusted p-value = m*p
 	 */
 	public void calculate() {
+		if(taskMonitor != null)
+			taskMonitor.setTitle("Calculating Bonferroni corrections");
 
 		// ordening the pvalues.
 		java.util.Arrays.sort(hash, new HashComparator());
@@ -245,16 +245,4 @@ public class Bonferroni implements CalculateCorrectionTask {
 	public String[] getOrdenedGOLabels() {
 		return ordenedGOLabels;
 	}
-
-
-	public void cancel() {
-		this.interrupted = true;		
-	}
-
-//	public void run(TaskMonitor tm) throws Exception {
-//		this.taskMonitor = tm;
-//		this.taskMonitor.setTitle("Calculating Bonferroni corrections");
-//		calculate();		
-//	}
-
 }

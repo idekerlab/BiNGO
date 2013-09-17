@@ -50,7 +50,7 @@ import org.cytoscape.work.TaskMonitor;
  * *************************************************************
  */
 
-public class BinomialTestCalculateUnder implements CalculateTestTask {
+public class BinomialTestCalculateUnder extends CalculateTestTask {
 
 	/**
 	 * hashmap with as values the values of small n and with as key the GO
@@ -81,18 +81,13 @@ public class BinomialTestCalculateUnder implements CalculateTestTask {
 
 	// Keep track of progress for monitoring:
 	private int maxValue;
-	private TaskMonitor taskMonitor = null;
-	private boolean interrupted = false;
 
 	/**
 	 * constructor with as arguments the selected cluster, the reference set
 	 * (from graph or annotation file), the annotation, the ontology and the
 	 * significance threshold.
-	 * @throws InterruptedException 
 	 */
-	public BinomialTestCalculateUnder(DistributionCount dc, TaskMonitor tm) throws InterruptedException {
-		this.taskMonitor = tm;
-		this.taskMonitor.setTitle("Calculating Binomial Distribution");
+	public BinomialTestCalculateUnder(DistributionCount dc) {
 		// calculates x (#genes in selection assigned to each GO class), X
 		// (total #genes in selection),
 		// n (# genes in reference set assigned to each GO class) and N (total #
@@ -104,14 +99,20 @@ public class BinomialTestCalculateUnder implements CalculateTestTask {
 		this.mapBigX = dc.getMapBigX();
 		this.maxValue = mapSmallX.size();
 	}
+	
+	public BinomialTestCalculateUnder(DistributionCount dc, TaskMonitor taskMonitor) {
+        this(dc);
+        this.taskMonitor = taskMonitor;
+    }
 
 	/**
 	 * method that redirects the calculation of the Binomial Tests to the
 	 * BinomialDistribution class.
-	 * 
-	 * @throws InterruptedException
 	 */
 	public void calculate() throws InterruptedException {
+		if(taskMonitor != null)
+			taskMonitor.setTitle("Calculating Binomial Distribution");
+
 		BinomialDistributionUnder bt;
 		binomialTestMap = new HashMap();
 
@@ -145,9 +146,10 @@ public class BinomialTestCalculateUnder implements CalculateTestTask {
 
 			currentProgress++;
 
-			if (interrupted)
-				throw new InterruptedException();
+			if (cancelled)
+				throw new InterruptedException("Binomial P-value calculation cancelled");
 		}
+
 	}
 
 
@@ -184,9 +186,5 @@ public class BinomialTestCalculateUnder implements CalculateTestTask {
 
 	public Map getMapBigN() {
 		return mapBigN;
-	}
-
-	public void cancel() {
-		this.interrupted = true;
 	}
 }

@@ -43,7 +43,6 @@ import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -54,13 +53,12 @@ import java.util.Set;
 
 import javax.swing.JOptionPane;
 
+import org.cytoscape.app.swing.CySwingAppAdapter;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
-import org.cytoscape.app.swing.CySwingAppAdapter;
 import org.cytoscape.view.model.CyNetworkView;
-import org.cytoscape.work.AbstractTask;
-import org.cytoscape.work.TaskManager;
 import org.cytoscape.work.TaskMonitor;
+import org.cytoscape.work.swing.DialogTaskManager;
 
 import bingo.internal.ui.SettingsPanel;
 
@@ -595,19 +593,10 @@ public class SettingsPanelActionListener implements ActionListener {
 		// should be called again
 		if (params.getStatus() == false) {
 			AnnotationParser annParser = params.initializeAnnotationParser();
-//			TaskManager taskManager = adapter.getTaskManager();
-//			System.out.println("\nCalling annotation parser...");
-//			taskManager.execute(new GenericTaskFactory(annParser).createTaskIterator());
-			try {
-				annParser.calculate();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-//			System.out.println("Calling annotation parser...DONE!!");
+			System.out.println("\nCalling annotation parser...");
+			DialogTaskManager taskManager = adapter.getDialogTaskManager();
+			taskManager.execute(new GenericTaskFactory(annParser).createTaskIterator()); 
+			System.out.println("Calling annotation parser...DONE!!");
 			if (annParser.getStatus()) {
 				params.setAnnotation(annParser.getAnnotation());
 				params.setOntology(annParser.getOntology());
@@ -944,108 +933,75 @@ public class SettingsPanelActionListener implements ActionListener {
 	 */
 
 	public void performCalculations(Set selectedNodes, Set allNodes, Set noClassificationsSet) {
-		final PostProcessTask calc = new PostProcessTask(selectedNodes, allNodes, noClassificationsSet);
-		// Execute task here!
-		final TaskManager tm = adapter.getTaskManager();
-		tm.execute((new GenericTaskFactory(calc)).createTaskIterator());
-	}
-	
-	private final class PostProcessTask extends AbstractTask {
-		
-		private final Set selectedNodes; 
-		private final Set allNodes;
-		private final Set noClassificationsSet;
-		
-		PostProcessTask(Set selectedNodes, Set allNodes, Set noClassificationsSet) {
-			this.selectedNodes = selectedNodes;
-			this.allNodes = allNodes;
-			this.noClassificationsSet = noClassificationsSet;
+		Map testMap = null;
+		Map correctionMap = null;
+		Map mapSmallX = null;
+		Map mapSmallN = null;
+		Map mapBigX = null;
+		Map mapBigN = null;
+					
+		BingoAlgorithm algorithm = new BingoAlgorithm(params);
+		DialogTaskManager taskManager = adapter.getDialogTaskManager();
+		CalculateTestTask test = algorithm.calculate_distribution();
+		taskManager.execute(new GenericTaskFactory(test).createTaskIterator());
+
+		testMap = test.getTestMap();
+		CalculateCorrectionTask correction = algorithm.calculate_corrections(testMap);
+
+		if ((correction != null) && (!params.getTest().equals(NONE))) {
+			taskManager.execute(new GenericTaskFactory(correction).createTaskIterator());
+			correctionMap = correction.getCorrectionMap();
+		}
+		mapSmallX = test.getMapSmallX();
+		mapSmallN = test.getMapSmallN();
+		mapBigX = test.getMapBigX();
+		mapBigN = test.getMapBigN();
+
+		DisplayBiNGOWindow display;
+		CreateBiNGOFile file;
+
+		if (params.getVisualization().equals(VIZSTRING)) {
+			display = new DisplayBiNGOWindow(testMap, correctionMap, mapSmallX, mapSmallN, mapBigX, mapBigN, params
+					.getSignificance().toString(), params.getOntology(), params.getCluster_name(), params.getCategory()
+					+ "", adapter);
+
+			// displaying the bingo CyNetwork.
+			display.makeWindow(); 
+		}
+		if ((goBin == null) || goBin.isWindowClosed()) {
+			goBin = new bingo.internal.GOlorize.GoBin(settingsPanel, startNetworkView, adapter);
 		}
 
-		@Override
-		public void run(TaskMonitor tm) throws Exception {
-			Map testMap = null;
-			Map correctionMap = null;
-			Map mapSmallX = null;
-			Map mapSmallN = null;
-			Map mapBigX = null;
-			Map mapBigN = null;
-
-			tm.setProgress(0.01);
-						
-			BingoAlgorithm algorithm = new BingoAlgorithm(params);
-			CalculateTestTask test = algorithm.calculate_distribution(tm);
-			test.calculate();
-
-			tm.setProgress(0.05);
-
-			testMap = test.getTestMap();
-			CalculateCorrectionTask correction = algorithm.calculate_corrections(testMap);
-
-			tm.setProgress(0.08);
-
-			if ((correction != null) && (!params.getTest().equals(NONE))) {
-				correction.calculate();
-				correctionMap = correction.getCorrectionMap();
-			}
-			mapSmallX = test.getMapSmallX();
-			mapSmallN = test.getMapSmallN();
-			mapBigX = test.getMapBigX();
-			mapBigN = test.getMapBigN();
-
-			DisplayBiNGOWindow display;
-			CreateBiNGOFile file;
-
-			tm.setProgress(0.15);
-
-			if (params.getVisualization().equals(VIZSTRING)) {
-				display = new DisplayBiNGOWindow(testMap, correctionMap, mapSmallX, mapSmallN, mapBigX, mapBigN, params
-						.getSignificance().toString(), params.getOntology(), params.getCluster_name(), params.getCategory()
-						+ "", adapter);
-
-				// displaying the bingo CyNetwork.
-				display.makeWindow();
-			}
-			if ((goBin == null) || goBin.isWindowClosed()) {
-				goBin = new bingo.internal.GOlorize.GoBin(settingsPanel, startNetworkView, adapter);
-			}
-
-			if (params.getAnnotationFile() == null) {
-				params.setAnnotationFile("Cytoscape loaded annotation: " + params.getAnnotation().toString());
-			}
-
-			if (params.getOntologyFile() == null) {
-				params.setOntologyFile("Cytoscape loaded ontology: " + params.getOntology().toString());
-			}
-
-			tm.setProgress(0.6);
-
-			goBin.createResultTab(testMap, correctionMap, mapSmallX, mapSmallN, mapBigX, mapBigN, params.getSignificance()
-					.toString(), params.getAnnotation(), params.getAlias(), params.getOntology(), params
-					.getAnnotationFile().toString(), params.getOntologyFile().toString(), params.getTest() + "",
-					params.getCorrection() + "", params.getOverOrUnder() + "", params.getFileoutput_dir(),
-					params.getCluster_name() + ".bgo", params.getReferenceSet() + "", params.getCategory() + "",
-					selectedNodes, startNetwork, startNetworkView);
-
-			if (params.isFileoutput()) {
-				file = new CreateBiNGOFile(testMap, correctionMap, mapSmallX, mapSmallN, mapBigX, mapBigN, params
-						.getSignificance().toString(), params.getAnnotation(), params.getDeleteCodes(), params.getAlias(),
-						params.getOntology(), params.getAnnotationFile().toString(), params.getOntologyFile().toString(),
-						params.getTest() + "", params.getCorrection() + "", params.getOverOrUnder() + "",
-						params.getFileoutput_dir(), params.getCluster_name() + ".bgo", params.getReferenceSet() + "",
-						params.getCategory() + "", selectedNodes, noClassificationsSet);
-				file.makeFile();
-
-				if (params.getTest().equals(NONE) && params.getCorrection().equals(NONE)) {
-					CreateAnnotationFile file2 = new CreateAnnotationFile(params.getAnnotation(), params.getAlias(),
-							params.getOntology(), params.getFileoutput_dir(), params.getCluster_name() + ".anno",
-							selectedNodes);
-					file2.makeFile();
-				}
-			}
-			
-			tm.setProgress(0.99);
+		if (params.getAnnotationFile() == null) {
+			params.setAnnotationFile("Cytoscape loaded annotation: " + params.getAnnotation().toString());
 		}
-		
+
+		if (params.getOntologyFile() == null) {
+			params.setOntologyFile("Cytoscape loaded ontology: " + params.getOntology().toString());
+		}
+
+		goBin.createResultTab(testMap, correctionMap, mapSmallX, mapSmallN, mapBigX, mapBigN, params.getSignificance()
+				.toString(), params.getAnnotation(), params.getAlias(), params.getOntology(), params
+				.getAnnotationFile().toString(), params.getOntologyFile().toString(), params.getTest() + "",
+				params.getCorrection() + "", params.getOverOrUnder() + "", params.getFileoutput_dir(),
+				params.getCluster_name() + ".bgo", params.getReferenceSet() + "", params.getCategory() + "",
+				selectedNodes, startNetwork, startNetworkView);
+
+		if (params.isFileoutput()) {
+			file = new CreateBiNGOFile(testMap, correctionMap, mapSmallX, mapSmallN, mapBigX, mapBigN, params
+					.getSignificance().toString(), params.getAnnotation(), params.getDeleteCodes(), params.getAlias(),
+					params.getOntology(), params.getAnnotationFile().toString(), params.getOntologyFile().toString(),
+					params.getTest() + "", params.getCorrection() + "", params.getOverOrUnder() + "",
+					params.getFileoutput_dir(), params.getCluster_name() + ".bgo", params.getReferenceSet() + "",
+					params.getCategory() + "", selectedNodes, noClassificationsSet);
+			file.makeFile();
+
+			if (params.getTest().equals(NONE) && params.getCorrection().equals(NONE)) {
+				CreateAnnotationFile file2 = new CreateAnnotationFile(params.getAnnotation(), params.getAlias(),
+						params.getOntology(), params.getFileoutput_dir(), params.getCluster_name() + ".anno",
+						selectedNodes);
+				file2.makeFile();
+			}
+		}	
 	}
 }
