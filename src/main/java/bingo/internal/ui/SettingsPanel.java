@@ -53,6 +53,7 @@ import javax.swing.JTextField;
 
 import org.cytoscape.app.swing.CySwingAppAdapter;
 import org.cytoscape.util.swing.OpenBrowser;
+import org.cytoscape.work.SynchronousTaskManager;
 
 import bingo.internal.BingoAlgorithm;
 import bingo.internal.BingoParameters;
@@ -231,15 +232,17 @@ public class SettingsPanel extends JPanel {
 	
 	private final CySwingAppAdapter adapter;
 	private final OpenBrowser openBrowserService;
+	private final SynchronousTaskManager<?> syncTaskManager;
 
 	/**
 	 * This constructor creates the panel with its swing-components.
 	 */
-	public SettingsPanel(final String bingoDir, final CySwingAppAdapter adapter, OpenBrowser openBrowserService) {
+	public SettingsPanel(final String bingoDir, final CySwingAppAdapter adapter, final OpenBrowser openBrowserService, final SynchronousTaskManager<?> syncTaskManager) {
 		super();
 		this.bingoDir = bingoDir;
 		this.adapter= adapter;
 		this.openBrowserService = openBrowserService;
+		this.syncTaskManager = syncTaskManager;
 
 		// Create a new bingo parameter set
 		try {
@@ -473,7 +476,7 @@ public class SettingsPanel extends JPanel {
 		// the bingo-button to start the calculations.
 		bingoButton = new JButton("Start BiNGO");
 		bingoButton.setMnemonic(KeyEvent.VK_B);
-		bingoButton.addActionListener(new SettingsPanelActionListener(params, this, adapter));
+		bingoButton.addActionListener(new SettingsPanelActionListener(params, this, adapter, syncTaskManager));
 	}
 
 	public TextOrGraphPanel getTextOrGraphPanel() {

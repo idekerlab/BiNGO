@@ -57,6 +57,7 @@ import org.cytoscape.app.swing.CySwingAppAdapter;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.CyNetworkView;
+import org.cytoscape.work.SynchronousTaskManager;
 import org.cytoscape.work.TaskMonitor;
 import org.cytoscape.work.swing.DialogTaskManager;
 
@@ -80,6 +81,7 @@ import bingo.internal.ui.SettingsPanel;
 public class SettingsPanelActionListener implements ActionListener {
 
 	private final CySwingAppAdapter adapter;
+	private final SynchronousTaskManager<?> syncTaskManager;
 
 	private SettingsPanel settingsPanel;
 	private BingoParameters params;
@@ -116,8 +118,9 @@ public class SettingsPanelActionListener implements ActionListener {
 	 * Constructor with all the settings of the settingspanel as arguments.
 	 */
 	public SettingsPanelActionListener(final BingoParameters params, SettingsPanel settingsPanel,
-			final CySwingAppAdapter adapter) {
+			final CySwingAppAdapter adapter, final SynchronousTaskManager<?> syncTaskManager) {
 		this.adapter = adapter;
+		this.syncTaskManager = syncTaskManager;
 		this.params = params;
 		this.settingsPanel = settingsPanel;
 		this.goBin = null;
@@ -594,8 +597,7 @@ public class SettingsPanelActionListener implements ActionListener {
 		if (params.getStatus() == false) {
 			AnnotationParser annParser = params.initializeAnnotationParser();
 			System.out.println("\nCalling annotation parser...");
-			DialogTaskManager taskManager = adapter.getDialogTaskManager();
-			taskManager.execute(new GenericTaskFactory(annParser).createTaskIterator()); 
+			syncTaskManager.execute(new GenericTaskFactory(annParser).createTaskIterator()); 
 			System.out.println("Calling annotation parser...DONE!!");
 			if (annParser.getStatus()) {
 				params.setAnnotation(annParser.getAnnotation());
@@ -941,15 +943,14 @@ public class SettingsPanelActionListener implements ActionListener {
 		Map mapBigN = null;
 					
 		BingoAlgorithm algorithm = new BingoAlgorithm(params);
-		DialogTaskManager taskManager = adapter.getDialogTaskManager();
 		CalculateTestTask test = algorithm.calculate_distribution();
-		taskManager.execute(new GenericTaskFactory(test).createTaskIterator());
+		syncTaskManager.execute(new GenericTaskFactory(test).createTaskIterator());
 
 		testMap = test.getTestMap();
 		CalculateCorrectionTask correction = algorithm.calculate_corrections(testMap);
 
 		if ((correction != null) && (!params.getTest().equals(NONE))) {
-			taskManager.execute(new GenericTaskFactory(correction).createTaskIterator());
+			syncTaskManager.execute(new GenericTaskFactory(correction).createTaskIterator());
 			correctionMap = correction.getCorrectionMap();
 		}
 		mapSmallX = test.getMapSmallX();

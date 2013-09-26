@@ -21,14 +21,16 @@ public class BingoPluginAction extends AbstractCyAction {
 	private static final String WINDOW_TITLE = "BiNGO Settings";
 	private final CySwingAppAdapter adapter;
 	private final OpenBrowser openBrowserService;
+	private final SynchronousTaskManager<?> syncTaskManager;
 	private String bingoDir;
 	private static final long serialVersionUID = 4190390703299860130L;
 
 	// The constructor sets the text that should appear on the menu item.
-	public BingoPluginAction(final CySwingAppAdapter adapter, final OpenBrowser openBrowserService) {
+	public BingoPluginAction(final CySwingAppAdapter adapter, final OpenBrowser openBrowserService, final SynchronousTaskManager<?> syncTaskManager) {
 		super(MENU_NAME);
 		this.adapter = adapter;
 		this.openBrowserService = openBrowserService;
+		this.syncTaskManager = syncTaskManager;
 		setPreferredMenu(MENU_CATEGORY);
 		
 		//String cwd = System.getProperty(CURRENT_WORKING_DIRECTORY);
@@ -46,7 +48,7 @@ public class BingoPluginAction extends AbstractCyAction {
 	 */
 	public void actionPerformed(ActionEvent event) {
 		final JFrame window = new JFrame(WINDOW_TITLE);
-		final SettingsPanel settingsPanel = new SettingsPanel(bingoDir, (CySwingAppAdapter)adapter, openBrowserService);
+		final SettingsPanel settingsPanel = new SettingsPanel(bingoDir, (CySwingAppAdapter)adapter, openBrowserService, syncTaskManager);
 		window.getContentPane().add(settingsPanel);
 		window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		window.pack();
