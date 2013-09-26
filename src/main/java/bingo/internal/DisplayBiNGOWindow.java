@@ -61,8 +61,8 @@ import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.view.vizmap.VisualStyle;
 import org.cytoscape.work.AbstractTask;
+import org.cytoscape.work.SynchronousTaskManager;
 import org.cytoscape.work.TaskMonitor;
-import org.cytoscape.work.swing.DialogTaskManager;
 
 import bingo.internal.ontology.Ontology;
 import bingo.internal.ui.ColorPanel;
@@ -161,6 +161,7 @@ public class DisplayBiNGOWindow {
 	private Ontology ontology;
 
 	private final CySwingAppAdapter adapter;
+	private final SynchronousTaskManager<?> syncTaskManager;
 
 	/**
 	 * Constructor for an overrepresentation visualization with correction.
@@ -188,12 +189,13 @@ public class DisplayBiNGOWindow {
 	 */
 	public DisplayBiNGOWindow(Map<Integer, String> testMap, Map correctionMap, Map mapSmallX, Map mapSmallN,
 			Map mapBigX, Map mapBigN, String alpha, Ontology ontology, String clusterName, String categoriesString,
-			final CySwingAppAdapter adapter) {
+			final CySwingAppAdapter adapter, final SynchronousTaskManager<?> syncTaskManager) {
 
 		if (adapter == null)
 			throw new NullPointerException("Plugin Adapter is null.");
 
 		this.adapter = adapter;
+		this.syncTaskManager = syncTaskManager;
 		this.testMap = testMap;
 		this.correctionMap = correctionMap;
 		this.mapSmallX = mapSmallX;
@@ -219,8 +221,7 @@ public class DisplayBiNGOWindow {
 
 		// Create View
 		final CreateViewTask task = new CreateViewTask(network);
-		DialogTaskManager taskManager = adapter.getDialogTaskManager();
-		taskManager.execute(new GenericTaskFactory(task).createTaskIterator());
+		syncTaskManager.execute(new GenericTaskFactory(task).createTaskIterator());
 
 		// add color scale panel
 		JFrame window = new JFrame(clusterName + " Color Scale");

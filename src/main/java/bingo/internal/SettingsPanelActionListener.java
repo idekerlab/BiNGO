@@ -38,6 +38,8 @@ package bingo.internal;
  * * corrected p-values.  
  **/
 
+import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -51,7 +53,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import org.cytoscape.app.swing.CySwingAppAdapter;
 import org.cytoscape.model.CyNetwork;
@@ -59,7 +63,6 @@ import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.work.SynchronousTaskManager;
 import org.cytoscape.work.TaskMonitor;
-import org.cytoscape.work.swing.DialogTaskManager;
 
 import bingo.internal.ui.SettingsPanel;
 
@@ -149,6 +152,9 @@ public class SettingsPanelActionListener implements ActionListener {
 	 *            bingo-button clicked.
 	 */
 	public void actionPerformed(ActionEvent event) {
+		adapter.getCySwingApplication().getJFrame().toFront();
+        Component root = SwingUtilities.getRoot((JButton) event.getSource());
+        root.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
 		// Imports annotations, etc.
 		boolean status = updateParameters();
@@ -314,6 +320,7 @@ public class SettingsPanelActionListener implements ActionListener {
 				}
 			}
 		}
+		root.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
 
 	private String openResourceFile(String name) {	
@@ -964,7 +971,7 @@ public class SettingsPanelActionListener implements ActionListener {
 		if (params.getVisualization().equals(VIZSTRING)) {
 			display = new DisplayBiNGOWindow(testMap, correctionMap, mapSmallX, mapSmallN, mapBigX, mapBigN, params
 					.getSignificance().toString(), params.getOntology(), params.getCluster_name(), params.getCategory()
-					+ "", adapter);
+					+ "", adapter, syncTaskManager);
 
 			// displaying the bingo CyNetwork.
 			display.makeWindow(); 
