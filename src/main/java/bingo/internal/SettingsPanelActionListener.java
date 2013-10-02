@@ -152,7 +152,6 @@ public class SettingsPanelActionListener implements ActionListener {
 	 *            bingo-button clicked.
 	 */
 	public void actionPerformed(ActionEvent event) {
-		adapter.getCySwingApplication().getJFrame().toFront();
         Component root = SwingUtilities.getRoot((JButton) event.getSource());
         root.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
@@ -646,10 +645,10 @@ public class SettingsPanelActionListener implements ActionListener {
 
 			// gets the canonical name of the given node from the attributes object
 			//final String canonicalName = node.getCyRow().get(CyNetwork.NAME, String.class);
-			final String canonicalName = network.getDefaultNodeTable().getRow(node.getSUID()).get(CyNetwork.NAME, String.class);
+			String canonicalName = network.getDefaultNodeTable().getRow(node.getSUID()).get(CyNetwork.NAME, String.class);
 			
-//			String canonicalName = node.getIdentifier().toUpperCase();
-			if (canonicalName != null && canonicalName.length() != 0 && !canonicalNameVector.contains(canonicalName)) {
+			if (canonicalName != null && canonicalName.length() != 0 && !canonicalNameVector.contains(canonicalName.toUpperCase())) {
+				canonicalName = canonicalName.toUpperCase();
 				if (mapNames.contains(params.getAlias().get(canonicalName))) {
 					redundantIDs.put(canonicalName,
 							(HashSet<String>) params.getAlias().get(canonicalName));
@@ -774,10 +773,10 @@ public class SettingsPanelActionListener implements ActionListener {
 		final List<CyNode> nodes = network.getNodeList();
 		for (CyNode node: nodes) {
 			// gets the canonical name of the given node from the attributes object
-			//String canonicalName = node.getCyRow().get(CyNetwork.NAME, String.class);
 			String canonicalName = network.getDefaultNodeTable().getRow(node.getSUID()).get(CyNetwork.NAME, String.class);
 			
-			if (canonicalName != null && (canonicalName.length() != 0) && !canonicalNameVector.contains(canonicalName)) {
+			if (canonicalName != null && (canonicalName.length() != 0) && !canonicalNameVector.contains(canonicalName.toUpperCase())) {
+				canonicalName = canonicalName.toUpperCase();
 				if (mapNames.contains(params.getAlias().get(canonicalName))) {
 					redundantIDs.put(canonicalName,
 							(HashSet<String>) params.getAlias().get(canonicalName));
