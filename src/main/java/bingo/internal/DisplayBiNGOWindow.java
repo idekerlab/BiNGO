@@ -212,6 +212,8 @@ public class DisplayBiNGOWindow {
 	 * Method that builds up the new CyNetwork and shows it to the user.
 	 */
 	public void makeWindow() {
+		// bring Cytoscape desktop to foreground
+		adapter.getCySwingApplication().getJFrame().toFront();
 		// Create ontology DAG as CyNetwork
 		final CyNetwork network = buildNetwork();
 		adapter.getCyNetworkManager().addNetwork(network);
