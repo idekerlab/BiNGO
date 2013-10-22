@@ -1,0 +1,17 @@
+This directory contains test cases for the BiNGO app for Cytoscape 3.x. Each test case includes a data set to use (either a Cytoscape network or set of genes), expected output in Cytoscape network and .bgo format, and ontology and annotation files (if applicable).
+
+The following test cases are available:
+
+galFiltered - This is based on part of the tutorial on the BiNGO website, which uses the galFiltered.cys sample session included in Cytoscape 2.x. Includes a Cytoscape 3 session file (galFiltered.cys) containing source and output networks as well as the corresponding BiNGO output file. BiNGO should be run on the default galFiltered network with all default parameters.
+
+geneList - This is based on another part of the tutorial on the BiNGO website, which uses genes entered manually into BiNGO. Includes text file containing the list of genes, an ontology and annotation file, as well as sample output in the form of a .cys session and .bgo output files. BiNGO should be run with the provided gene list in the text input field, the provided ontology and annotation files, and the "goslim_plant" namespace, with defaults for all other parameters.
+
+Results are included for both the basic case described above and the same test case with the IEA and ISS evidence codes discarded; to test the latter, simply enter "iea isa" into the "Discard the following evidence codes" field in BiNGO.
+
+imex_with_up_ac - This is based on a set of mouse genes with UniProt identifiers. Includes a Cytoscape 3 session containing source and output networks as well as the corresponding BiNGO output file. BiNGO should be run on the source network with the provided ontology and gene association files, with defaults for all other parameters.
+
+mouse_protsOnly - This is based on a set of mouse genes identified with gene symbols. Includes a Cytoscape 3 session containing source and output networks as well as the corresponding BiNGO output file. BiNGO should be run on the source network with the provided ontology and gene association files, with defaults for all other parameters.
+
+For more information about BiNGO, visit the BiNGO website at:
+
+http://www.psb.ugent.be/cbd/papers/BiNGO/
