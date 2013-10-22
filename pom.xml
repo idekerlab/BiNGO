@@ -17,6 +17,7 @@
 	<version>3.0.2</version>
 
 	<build>
+		<finalName>BiNGO</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
