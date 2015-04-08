@@ -443,7 +443,7 @@ public class CreateBiNGOFile {
 							ok = false;
 						}
 					} else {
-						output.write(termID + "\t" + pvalue + "\t" + smallX + "\t" + smallN + bigX + "\t" + bigN + "\t"
+						output.write(termID + "\t" + pvalue + "\t" + smallX + "\t" + smallN + "\t" + bigX + "\t" + bigN + "\t"
 								+ "\t" + description + "\t");
 						if (annotatedGenes.containsKey(termID)) {
 							Iterator k = ((HashSet) annotatedGenes.get(termID)).iterator();

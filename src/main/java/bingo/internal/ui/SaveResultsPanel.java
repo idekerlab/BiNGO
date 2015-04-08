@@ -257,11 +257,11 @@ public class SaveResultsPanel extends JPanel implements ItemListener, ActionList
         JFileChooser chooser = new JFileChooser(System.getProperty("user.home"));
         chooser.setDialogTitle("Select output directory");
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        int returnVal = chooser.showSaveDialog(settingsPanel);
+        chooser.setApproveButtonText("Select");
+        int returnVal = chooser.showOpenDialog(settingsPanel);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             saveFile = chooser.getSelectedFile();
             fileTextField.setText(saveFile.toString());
-			
 		}	
 	}
 }

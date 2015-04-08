@@ -7,6 +7,7 @@
 		<cytoscape.api.version>3.0.0</cytoscape.api.version>
 		
 		<maven-bundle-plugin.version>2.3.4</maven-bundle-plugin.version>
+		<maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
 		<osgi.api.version>4.2.0</osgi.api.version>
 	</properties>
 
@@ -14,7 +15,7 @@
 	<artifactId>bingo-impl</artifactId>
 	<packaging>bundle</packaging>
 	<name>BiNGO</name>
-	<version>3.0.2</version>
+	<version>3.0.3</version>
 
 	<build>
 		<finalName>BiNGO</finalName>
@@ -33,6 +34,15 @@
 						<Bundle-Activator>${bundle.namespace}.CyActivator</Bundle-Activator>
 						<Embed-Dependency>colt,concurrent;scope=compile|runtime</Embed-Dependency>
 					</instructions>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
 				</configuration>
 			</plugin>
 		</plugins>
